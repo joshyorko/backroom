@@ -25,6 +25,7 @@ module Backroom
         def create_migration_file
           migration_template "create_progress_records.rb.tt", File.join("db/migrate", "create_#{table_name}.rb")
         end
+
         private
 
         def model_class_name

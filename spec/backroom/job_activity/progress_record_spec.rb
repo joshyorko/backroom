@@ -112,6 +112,18 @@ RSpec.describe Backroom::JobActivity::ProgressRecord do
       expect(TenantJobProgress.for_run(account_id: 7, job_class_name: "TenantScopedJob", run_id: "tenant-run")).to contain_exactly(record)
       expect(TenantJobProgress.for_run(tenant_id: 7, job_class_name: "TenantScopedJob", run_id: "tenant-run")).to contain_exactly(record)
     end
+
+    it "rejects conflicting compatibility and configured owner keys" do
+      expect {
+        TenantJobProgress.track!(
+          account_id: 7,
+          tenant_id: 8,
+          job_class_name: "TenantScopedJob",
+          run_id: "tenant-run",
+          status: "running"
+        )
+      }.to raise_error(ArgumentError, /conflicting owner values/)
+    end
   end
 
   describe "validations and scopes" do
