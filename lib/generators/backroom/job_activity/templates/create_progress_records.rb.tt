@@ -21,9 +21,9 @@ class <%= migration_class_name %> < ActiveRecord::Migration[7.1]
     add_index :<%= table_name %>,
       [ :<%= owner_key %>, :job_class_name, :run_id ],
       unique: true,
-      name: "index_<%= table_name %>_on_<%= owner_key %>_job_run"
+      name: "<%= run_index_name %>"
     add_index :<%= table_name %>,
       [ :<%= owner_key %>, :job_class_name, :started_at ],
-      name: "index_<%= table_name %>_on_<%= owner_key %>_job_started"
+      name: "<%= started_index_name %>"
   end
 end

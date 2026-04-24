@@ -44,4 +44,17 @@ RSpec.describe Backroom::JobActivity::Generators::InstallGenerator do
     expect(File.read(migration_path)).to include("t.integer :tenant_id, null: false")
     expect(File.read(migration_path)).to include("index_tenant_job_progresses_on_tenant_id_job_run")
   end
+
+  it "shortens generated index names for long identifiers" do
+    run_generator(
+      "TenantScopedBackroomProgressRecord",
+      "--table_name=tenant_scoped_backroom_progress_records",
+      "--owner_key=organization_account_id"
+    )
+
+    migration_path = generated_file("db/migrate/*_create_tenant_scoped_backroom_progress_records.rb")
+    index_names = File.read(migration_path).scan(/name: "([^"]+)"/).flatten
+
+    expect(index_names).to all(satisfy { |name| name.length <= 63 })
+  end
 end

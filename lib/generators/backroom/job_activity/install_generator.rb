@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "digest"
 require "rails/generators"
 require "rails/generators/active_record"
 require "rails/generators/migration"
@@ -50,6 +51,22 @@ module Backroom
 
         def table_name_override?
           table_name != model_class_name.tableize
+        end
+
+        def run_index_name
+          shortened_index_name("run")
+        end
+
+        def started_index_name
+          shortened_index_name("started")
+        end
+
+        def shortened_index_name(suffix)
+          base = "index_#{table_name}_on_#{owner_key}_job_#{suffix}"
+          return base if base.length <= 63
+
+          digest = Digest::SHA256.hexdigest(base).first(8)
+          "#{base.first(54)}_#{digest}"
         end
       end
     end
