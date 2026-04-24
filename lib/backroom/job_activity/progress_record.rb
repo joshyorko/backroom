@@ -90,7 +90,6 @@ module Backroom
           end
 
           record.phase = phase if phase.present?
-          record.public_send("#{job_activity_owner_key}=", owner_value)
           record.total = normalize_count(total) unless total.nil?
           record.completed = normalize_count(completed) unless completed.nil?
           record.skipped = normalize_count(skipped) unless skipped.nil?

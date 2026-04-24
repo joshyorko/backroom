@@ -7,8 +7,8 @@ class <%= model_class_name %> < ApplicationRecord
   self.table_name = "<%= table_name %>"
 <% end -%>
 
-  # Uncomment and adjust this association to match your app's owner model:
-  # belongs_to :<%= owner_association_name %>
+  # Uncomment and adjust this association to match your app's owner model and column:
+  # belongs_to :<%= owner_association_name %>, foreign_key: :<%= owner_key %>
   #
   # self.job_activity_after_commit = lambda do |progress|
   #   Admin::JobActivityBroadcaster.broadcast(progress)
