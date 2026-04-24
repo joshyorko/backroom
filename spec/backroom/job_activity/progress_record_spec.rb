@@ -99,6 +99,19 @@ RSpec.describe Backroom::JobActivity::ProgressRecord do
 
       expect(calls).to eq([ "hooked" ])
     end
+
+    it "supports a configured owner key while keeping account_id compatible" do
+      record = TenantJobProgress.track!(
+        tenant_id: 7,
+        job_class_name: "TenantScopedJob",
+        run_id: "tenant-run",
+        status: "running"
+      )
+
+      expect(record.tenant_id).to eq(7)
+      expect(TenantJobProgress.for_run(account_id: 7, job_class_name: "TenantScopedJob", run_id: "tenant-run")).to contain_exactly(record)
+      expect(TenantJobProgress.for_run(tenant_id: 7, job_class_name: "TenantScopedJob", run_id: "tenant-run")).to contain_exactly(record)
+    end
   end
 
   describe "validations and scopes" do

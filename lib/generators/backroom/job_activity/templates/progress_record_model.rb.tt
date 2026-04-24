@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+class <%= model_class_name %> < ApplicationRecord
+  include Backroom::JobActivity::ProgressRecord
+<% if table_name_override? -%>
+
+  self.table_name = "<%= table_name %>"
+<% end -%>
+
+  # belongs_to :account
+  #
+  # self.job_activity_after_commit = lambda do |progress|
+  #   Admin::JobActivityBroadcaster.broadcast(progress)
+  # end
+end

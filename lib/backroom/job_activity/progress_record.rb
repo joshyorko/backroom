@@ -15,18 +15,27 @@ module Backroom
       FINAL_STATUSES = %w[finished failed cancelled].freeze
 
       included do
-        class_attribute :job_activity_after_commit, instance_accessor: false, default: nil
+        owner_key = Backroom::JobActivity.owner_key
 
-        validates :account_id, :job_class_name, :run_id, :status, :started_at, presence: true
+        class_attribute :job_activity_after_commit, instance_accessor: false, default: nil
+        class_attribute :job_activity_owner_key, instance_accessor: false, default: owner_key
+
+        validates owner_key, :job_class_name, :run_id, :status, :started_at, presence: true
         validates :status, inclusion: { in: ACTIVE_STATUSES + FINAL_STATUSES }
         validates :percent, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
         validates :total, :completed, :skipped, :failed, numericality: { greater_than_or_equal_to: 0 }
 
         scope :recent_first, -> { order(started_at: :desc, created_at: :desc) }
         scope :active, -> { where(status: ACTIVE_STATUSES) }
-        scope :for_run, ->(account_id:, job_class_name:, run_id:) {
-          where(
+        scope :for_run, ->(account_id: nil, job_class_name:, run_id:, **owner_attributes) {
+          owner_value = Backroom::JobActivity.extract_owner_value!(
+            owner_key: klass.job_activity_owner_key,
             account_id: account_id,
+            owner_attributes: owner_attributes
+          )
+
+          where(
+            klass.job_activity_owner_key => owner_value,
             job_class_name: job_class_name.to_s,
             run_id: run_id.to_s
           )
@@ -37,7 +46,7 @@ module Backroom
 
       class_methods do
         def track!(
-          account_id:,
+          account_id: nil,
           job_class_name:,
           run_id:,
           status: nil,
@@ -48,10 +57,17 @@ module Backroom
           failed: nil,
           metadata: nil,
           started_at: nil,
-          finished_at: nil
+          finished_at: nil,
+          **owner_attributes
         )
-          record = for_run(
+          owner_value = Backroom::JobActivity.extract_owner_value!(
+            owner_key: job_activity_owner_key,
             account_id: account_id,
+            owner_attributes: owner_attributes
+          )
+
+          record = for_run(
+            job_activity_owner_key => owner_value,
             job_class_name: job_class_name,
             run_id: run_id
           ).first_or_initialize
@@ -73,6 +89,7 @@ module Backroom
           end
 
           record.phase = phase if phase.present?
+          record.public_send("#{job_activity_owner_key}=", owner_value)
           record.total = normalize_count(total) unless total.nil?
           record.completed = normalize_count(completed) unless completed.nil?
           record.skipped = normalize_count(skipped) unless skipped.nil?

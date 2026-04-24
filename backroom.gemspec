@@ -25,7 +25,8 @@ Gem::Specification.new do |spec|
       "LICENSE.txt",
       "README.md",
       "COPILOT_BOOTSTRAP_PROMPT.md",
-      "lib/**/*.rb"
+      "lib/**/*.rb",
+      "lib/generators/**/*"
     ]
   end
 
