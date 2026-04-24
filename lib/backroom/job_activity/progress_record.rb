@@ -28,15 +28,15 @@ module Backroom
         scope :recent_first, -> { order(started_at: :desc, created_at: :desc) }
         scope :active, -> { where(status: ACTIVE_STATUSES) }
         scope :for_run, ->(account_id: nil, job_class_name:, run_id:, **owner_attributes) {
-          record_class = model
+          progress_class = model
           owner_value = Backroom::JobActivity.extract_owner_value!(
-            owner_key: record_class.job_activity_owner_key,
+            owner_key: progress_class.job_activity_owner_key,
             account_id: account_id,
             owner_attributes: owner_attributes
           )
 
           where(
-            record_class.job_activity_owner_key => owner_value,
+            progress_class.job_activity_owner_key => owner_value,
             job_class_name: job_class_name.to_s,
             run_id: run_id.to_s
           )
