@@ -40,7 +40,7 @@ module Backroom
         owner_value = account_id if owner_value.nil?
 
         if attributes.any?
-          raise ArgumentError, "unknown keywords: #{attributes.keys.map(&:inspect).join(', ')}"
+          raise ArgumentError, "unexpected owner attributes: #{attributes.keys.map(&:inspect).join(', ')}"
         end
 
         owner_value
