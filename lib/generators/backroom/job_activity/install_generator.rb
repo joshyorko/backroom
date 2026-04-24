@@ -11,6 +11,9 @@ module Backroom
       class InstallGenerator < Rails::Generators::Base
         include ActiveRecord::Generators::Migration
 
+        MAX_INDEX_NAME_LENGTH = 63
+        INDEX_NAME_DIGEST_LENGTH = 8
+
         source_root File.expand_path("templates", __dir__)
         namespace "backroom:job_activity:install"
 
@@ -63,10 +66,11 @@ module Backroom
 
         def shortened_index_name(suffix)
           base = "index_#{table_name}_on_#{owner_key}_job_#{suffix}"
-          return base if base.length <= 63
+          return base if base.length <= MAX_INDEX_NAME_LENGTH
 
-          digest = Digest::SHA256.hexdigest(base).first(8)
-          "#{base.first(54)}_#{digest}"
+          digest = Digest::SHA256.hexdigest(base).first(INDEX_NAME_DIGEST_LENGTH)
+          truncated_base_length = MAX_INDEX_NAME_LENGTH - INDEX_NAME_DIGEST_LENGTH - 1
+          "#{base.first(truncated_base_length)}_#{digest}"
         end
       end
     end
