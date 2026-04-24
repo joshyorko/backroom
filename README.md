@@ -24,6 +24,28 @@ class TenantJobProgress < ApplicationRecord
 end
 ```
 
+Or generate a starting model and migration in a Rails host app:
+
+```sh
+bin/rails generate backroom:job_activity:install
+bin/rails generate backroom:job_activity:install TenantJobProgress --table_name=tenant_job_progresses --owner_key=tenant_id
+```
+
+Optional defaults can be configured before running the generator or loading host models:
+
+```ruby
+Backroom::JobActivity.configure do |config|
+  config.owner_key = :account_id
+  config.default_table_name = :tenant_job_progresses
+end
+```
+
+The generator creates:
+
+- a host-owned progress model including `Backroom::JobActivity::ProgressRecord`
+- a migration for the progress table without a database foreign key
+- commented examples for host-owned associations and broadcasting hooks
+
 ## Required Table Shape
 
 The host app should provide a table like this. The table and model names are intentionally app-owned for now.
@@ -64,6 +86,7 @@ add_index :tenant_job_progresses,
 - validations for required identity fields, status, percent, and non-negative counters
 - scopes: `recent_first`, `active`, and `for_run(account_id:, job_class_name:, run_id:)`
 - `.track!` upsert semantics keyed by `account_id`, `job_class_name`, and `run_id`
+- configurable owner-key storage while keeping `account_id:` compatible in `.track!`
 - count normalization and percent calculation
 - queued/scheduled timestamp preservation through `metadata["queued_at"]`
 - `#active?`
