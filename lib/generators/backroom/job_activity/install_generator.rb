@@ -48,6 +48,10 @@ module Backroom
           options["owner_key"].presence || Backroom::JobActivity.owner_key.to_s
         end
 
+        def owner_association_name
+          owner_key.delete_suffix("_id")
+        end
+
         def migration_class_name
           "Create#{table_name.camelize}"
         end
@@ -68,7 +72,7 @@ module Backroom
           base = "index_#{table_name}_on_#{owner_key}_job_#{suffix}"
           return base if base.length <= MAX_INDEX_NAME_LENGTH
 
-          digest = Digest::SHA256.hexdigest(base).first(INDEX_NAME_DIGEST_LENGTH)
+          digest = Digest::MD5.hexdigest(base).first(INDEX_NAME_DIGEST_LENGTH)
           truncated_base_length = MAX_INDEX_NAME_LENGTH - INDEX_NAME_DIGEST_LENGTH - 1
           "#{base.first(truncated_base_length)}_#{digest}"
         end

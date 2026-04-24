@@ -7,7 +7,7 @@ class <%= model_class_name %> < ApplicationRecord
   self.table_name = "<%= table_name %>"
 <% end -%>
 
-  # belongs_to :account
+  # belongs_to :<%= owner_association_name %>
   #
   # self.job_activity_after_commit = lambda do |progress|
   #   Admin::JobActivityBroadcaster.broadcast(progress)

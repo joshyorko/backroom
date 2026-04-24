@@ -39,7 +39,7 @@ RSpec.describe Backroom::JobActivity::Generators::InstallGenerator do
     migration_path = generated_file("db/migrate/*_create_tenant_job_progresses.rb")
 
     expect(File.read(model_path)).to include("class TenantJobProgress < ApplicationRecord")
-    expect(File.read(model_path)).to include("belongs_to :account")
+    expect(File.read(model_path)).to include("belongs_to :tenant")
     expect(File.read(migration_path)).to include("create_table :tenant_job_progresses")
     expect(File.read(migration_path)).to include("t.integer :tenant_id, null: false")
     expect(File.read(migration_path)).to include("index_tenant_job_progresses_on_tenant_id_job_run")

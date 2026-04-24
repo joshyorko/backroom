@@ -15,12 +15,12 @@ module Backroom
       FINAL_STATUSES = %w[finished failed cancelled].freeze
 
       included do
-        owner_key = Backroom::JobActivity.owner_key
+        configured_owner_key = Backroom::JobActivity.owner_key
 
         class_attribute :job_activity_after_commit, instance_accessor: false, default: nil
-        class_attribute :job_activity_owner_key, instance_accessor: false, default: owner_key
+        class_attribute :job_activity_owner_key, instance_accessor: false, default: configured_owner_key
 
-        validates owner_key, :job_class_name, :run_id, :status, :started_at, presence: true
+        validates configured_owner_key, :job_class_name, :run_id, :status, :started_at, presence: true
         validates :status, inclusion: { in: ACTIVE_STATUSES + FINAL_STATUSES }
         validates :percent, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
         validates :total, :completed, :skipped, :failed, numericality: { greater_than_or_equal_to: 0 }
