@@ -1,0 +1,16 @@
+# frozen_string_literal: true
+
+class <%= model_class_name %> < ApplicationRecord
+  include Backroom::JobActivity::ProgressRecord
+<% if table_name_override? -%>
+
+  self.table_name = "<%= table_name %>"
+<% end -%>
+
+  # Uncomment and adjust this association to match your app's owner model and column:
+  # belongs_to :<%= owner_association_name %>, foreign_key: :<%= owner_key %>
+  #
+  # self.job_activity_after_commit = lambda do |progress|
+  #   Admin::JobActivityBroadcaster.broadcast(progress)
+  # end
+end

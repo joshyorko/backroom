@@ -1,0 +1,29 @@
+class <%= migration_class_name %> < ActiveRecord::Migration[7.1]
+  def change
+    create_table :<%= table_name %> do |t|
+      t.integer :<%= owner_key %>, null: false
+      t.string :job_class_name, null: false
+      t.string :run_id, null: false
+      t.string :status, null: false, default: "running"
+      t.string :phase
+      t.integer :total, null: false, default: 0
+      t.integer :completed, null: false, default: 0
+      t.integer :skipped, null: false, default: 0
+      t.integer :failed, null: false, default: 0
+      t.integer :percent, null: false, default: 0
+      t.json :metadata, null: false, default: {}
+      t.datetime :started_at, null: false
+      t.datetime :finished_at
+
+      t.timestamps
+    end
+
+    add_index :<%= table_name %>,
+      [ :<%= owner_key %>, :job_class_name, :run_id ],
+      unique: true,
+      name: "<%= run_index_name %>"
+    add_index :<%= table_name %>,
+      [ :<%= owner_key %>, :job_class_name, :started_at ],
+      name: "<%= started_index_name %>"
+  end
+end
